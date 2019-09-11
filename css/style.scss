@@ -1,0 +1,310 @@
+$animation-timing: 500ms;
+$animation-timing-fast: 250ms;
+
+*,
+*:after,
+*:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  font-size: 100%;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  color: #333;
+  background: #FFFFFF;
+  font-size: 13px;
+  display: flex;
+}
+
+#app {
+  flex: 1;
+
+  > div,
+  > div > div {
+    height: 100%;
+  }
+
+  .settings {
+
+    height: 100%;
+    width: 200px;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: -200px;
+    margin: 0;
+    transition: all $animation-timing;
+    transition-timing-function: cubic-bezier(.645,.045,.355,1);
+    background-color: #fff;
+    will-change: transform;
+    backface-visibility: hidden;
+    box-shadow: 0px 0px 3px 1px rgba(0,0,0,.3);
+
+    .hamburger {
+      position: absolute;
+      right: -42px;
+      width: 40px;
+      height: 40px;
+      &:focus {
+        outline:0;
+      }
+      &:hover {
+        background-color: #EFEFEF;
+      }
+    }
+
+    h1 {
+      margin: 0px;
+      padding: 10px 6px;
+      font-size: 17px;
+      border-bottom: 1px solid #EFEFEF;
+      font-weight: 400;
+      height: 40px;
+    }
+
+    form {
+      padding: 6px;
+      label {
+        display: block;
+        text-transform: uppercase;
+        color: #3f6ad8;
+        font-size: 13px;
+        font-weight: 500;
+        margin: 10px 0px 4px 0px;
+      }
+
+      input[type='text'],
+      input[type='number'],
+      input[type='url'],
+      button {
+        width: 100%;
+        padding: 6px 4px;
+        font-size: 12px;
+        font-weight: 400;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: all .2s;
+
+        &:focus {
+          border-color: #a9bcee;
+          outline: 0;
+          box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25);
+        }
+      }
+
+      button {
+        color: #3f6ad8;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #e9ecef;
+        }
+      }
+
+      .url-list {
+        list-style-type: none;
+        padding-left: 0px;
+        margin-top: 0px;
+
+        li {
+          margin: 4px 0px;
+        }
+      }
+    }
+  }
+
+  .content {
+    height: 100%;
+    transition: all $animation-timing;
+    transition-timing-function: cubic-bezier(.645,.045,.355,1);
+
+    .tabs {
+      margin-left: 40px;
+      border-bottom: 1px solid #EFEFEF;
+      height: 40px;
+      position: relative;
+
+      &:after {
+        content: '';
+        position: absolute;
+        left: -40px;
+        bottom: -1px;
+        width: 100%;
+        border-bottom: 1px solid #EFEFEF;
+      }
+
+      > div {
+        position: relative;
+        display: inline-block;
+        width: 120px;
+        padding: 12px 14px;
+        cursor: pointer;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:hover {
+          background-color: #F7F7F7;
+        }
+
+        &.active {
+          font-weight: bold;
+          background-color: #EFEFEF;
+        }
+
+        &:after {
+          content: '';
+          position: absolute;
+          right: 0px;
+          top: 25%;
+          height: 50%;
+          border-right: 1px solid #EFEFEF;
+        }
+      }
+    }
+
+    .iframes {
+      height: 100%;
+
+      iframe {
+        width: 100%;
+        height: 100%;
+        display: none;
+        border: 0px;
+
+        &.active {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .fullscreen {
+    position: absolute;
+    z-index: 1;
+    top: 0px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+    background-color: #EFEFEF;
+    background: transparent url(img/fullscreen.png) no-repeat;
+    background-size: 30px 30px;
+    background-position: center center;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #EFEFEF;
+    }
+  }
+}
+
+body.settings-open {
+
+  #app {
+    .content {
+      margin-left: 200px;
+      margin-right: -200px;
+    }
+
+    .settings {
+      left: 0px;
+    }
+  }
+}
+
+
+/*!
+ * Hamburgers
+ * @description Tasty CSS-animated hamburgers
+ * @author Jonathan Suh @jonsuh
+ * @site https://jonsuh.com/hamburgers
+ * @link https://github.com/jonsuh/hamburgers
+ */
+.hamburger {
+  padding: 2px 2px;
+  display: inline-block;
+  cursor: pointer;
+  transition-property: opacity, filter;
+  transition-duration: 0.15s;
+  transition-timing-function: linear;
+  font: inherit;
+  color: inherit;
+  text-transform: none;
+  background-color: transparent;
+  border: 0;
+  margin: 0;
+  overflow: visible;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.is-active:hover {
+    opacity: 0.7;
+  }
+
+  &.is-active .hamburger-inner,
+  &.is-active .hamburger-inner::before,
+  &.is-active .hamburger-inner::after {
+    background-color: #000;
+  }
+
+  .hamburger-box {
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+    position: relative;
+
+
+    .hamburger-inner {
+      display: block;
+      top: 50%;
+      margin-top: 0px;
+    }
+
+    .hamburger-inner,
+    .hamburger-inner::before,
+    .hamburger-inner::after {
+      width: 26px;
+      height: 2px;
+      background-color: #666;
+      border-radius: 4px;
+      position: absolute;
+      transition-property: transform;
+      transition-duration: 0.15s;
+      transition-timing-function: ease;
+    }
+
+    .hamburger-inner::before,
+    .hamburger-inner::after {
+      content: "";
+      display: block;
+    }
+
+    .hamburger-inner::before {
+      top: -9px;
+    }
+
+    .hamburger-inner::after {
+      bottom: -9px;
+    }
+  }
+
+  &.hamburger--arrow.is-active .hamburger-inner::before {
+    transform: translate3d(-6px, 3px, 0) rotate(-45deg) scale(0.7, 1);
+  }
+
+  &.hamburger--arrow.is-active .hamburger-inner::after {
+    transform: translate3d(-6px, -3px, 0) rotate(45deg) scale(0.7, 1);
+  }
+}
