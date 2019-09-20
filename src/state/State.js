@@ -7,6 +7,7 @@ const provider = props => {
       settings: {
         id: null,
         cycletime: 5,
+        refreshtime: 60,
         urlItems: [
           location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')+'/testiframe',
           ''

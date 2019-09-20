@@ -81,7 +81,16 @@ const Content = () => {
     for (var i = 0; i < s.urlItems.length; i++) {
       s.urlItems[i].active = false;
     }
+
     s.urlItems[index].active = true;
+
+    // Do a refresh if within timeframe
+    let url = s.urlItems[index].url;
+    if( (Math.round((new Date()).getTime() / 1000)-s.urlItems[index].lastRefreshed) > s.refreshtime ) {
+      s.urlItems[index].url = '';
+      setSettings({...s});
+      s.urlItems[index].url = url;
+    }
 
     setSettings({...s});
   };
@@ -91,8 +100,6 @@ const Content = () => {
   }
 
   useEffect(() => {
-    clearInterval(rotateIntervalRef.current);
-
     let cycleTime = parseInt(state.data.settings.cycletime);
 
     if( 0 == cycleTime ) {

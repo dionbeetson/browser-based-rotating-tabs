@@ -9,7 +9,7 @@ const Settings = () => {
 
   const state = useStateValue();
 
-  const updateCycleTime = (event) => {
+  const updateInput = (event) => {
 		let name = event.target.name;
 		let value = event.target.value;
 
@@ -75,6 +75,8 @@ const Settings = () => {
 
 		localStorage.setItem('settings', JSON.stringify(settings));
 
+    settings.urlItems.push('');
+
     state.updateState({...settings});
   }
 
@@ -92,7 +94,10 @@ const Settings = () => {
 
         <form>
           <label htmlFor="cycletime">Cycle time</label>
-          <input type="number" id="cycletime" name="cycletime" min="0" max="500" value={context.data.settings.cycletime} onChange={updateCycleTime} />
+          <input type="number" id="cycletime" name="cycletime" min="0" max="500" value={context.data.settings.cycletime} onChange={updateInput} />
+
+          <label htmlFor="refreshtime">Refresh time</label>
+          <input type="number" id="refreshtime" name="refreshtime" min="0" max="3600" value={context.data.settings.refreshtime} onChange={updateInput} />
 
          <label>URLs</label>
          <ul className="url-list">
