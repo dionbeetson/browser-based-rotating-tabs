@@ -1,13 +1,8 @@
 import React from 'react';
 
-class FullScreen extends React.Component{
+const FullScreen = () => {
 
-  constructor(props){
-    super(props);
-		this.goFullScreen = this.goFullScreen.bind(this);
-  }
-
-  requestFullscreen(ele) {
+  const requestFullscreen = (ele) => {
   	if (ele.requestFullscreen) {
   		ele.requestFullscreen();
   	} else if (ele.webkitRequestFullscreen) {
@@ -21,7 +16,7 @@ class FullScreen extends React.Component{
   	}
   };
 
-  exitFullscreen() {
+  const exitFullscreen = () => {
   	if (document.exitFullscreen) {
   		document.exitFullscreen();
   	} else if (document.webkitExitFullscreen) {
@@ -35,19 +30,15 @@ class FullScreen extends React.Component{
   	}
   };
 
-	goFullScreen(event) {
+	const goFullScreen = (event) => {
     if( null == document.fullscreenElement ) {
-      this.requestFullscreen(document.documentElement);
+      requestFullscreen(document.documentElement);
     } else {
-      this.exitFullscreen();
+      exitFullscreen();
     }
   }
 
-	render(props, state) {
-    return (
-      <div className="fullscreen" onClick={this.goFullScreen}></div>
-    )
-  }
+  return (<div className="fullscreen" onClick={goFullScreen}></div>)
 }
 
 export default FullScreen

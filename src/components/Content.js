@@ -1,21 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-class Content extends React.Component{
+import { StateContext, useStateValue } from './../state/State.js';
 
-  constructor(props){
-    super(props);
+const Content = () => {
 
-    this.state = {rotateInterval: undefined, urlItems: []};
-    this.tabClick = this.tabClick.bind(this);
-    this.activateTab = this.activateTab.bind(this);
-    this.tabRotator = this.tabRotator.bind(this);
+  const state = useStateValue();
+
+  let rotateInterval = undefined;
+  let rotateIntervalRef = useRef(rotateInterval);
+  rotateIntervalRef.current = rotateInterval;
+
+  const [settings, setSettings] = useState({urlItems:[]});
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+
+  useEffect(() => {
+    let stateSettings = {...state.data.settings};
+    let urlItems = [];
+    const currentActiveTabIndex = getCurrentActiveTabIndex();
+
+    for (var i = 0; i < stateSettings.urlItems.length; i++) {
+      if ( isValidUrl(stateSettings.urlItems[i]) ) {
+        urlItems.push({
+          name: getDomainFromURL(stateSettings.urlItems[i]),
+          url: stateSettings.urlItems[i].substring(0),
+          active: (currentActiveTabIndex == i ? true : false),
+          lastRefreshed: Math.round((new Date()).getTime() / 1000)
+        })
+      }
+    }
+
+    stateSettings.urlItems = urlItems;
+
+    setSettings({...stateSettings});
+
+  }, [state.data]);
+
+  const isValidUrl = (url) => {
+    if ( 'http' == url.substring(0, 4) )
+    {
+      return true;
+    }
+
+    return false;
   }
 
-  componentDidMount(){
-    this.load();
-  }
-
-  getDomainFromURL(url) {
+  const getDomainFromURL = (url) => {
     let a = document.createElement('a');
     a.href = url;
     let hostname = a.hostname;
@@ -23,70 +53,61 @@ class Content extends React.Component{
     return hostname;
   }
 
-  load() {
-    let urlItems = [];
-    let settings = JSON.parse(localStorage.getItem('settings'));
-
-    if( null == settings || undefined == settings.urlItems ) {
-      this.tabRotator();
-      this.activateTab(0);
-      return;
+  const cleanArray = (urlItem) => {
+    if ( 'http' == urlItem.url.substring(0, 4) )
+    {
+      return true;
     }
 
-    for (var i = 0; i < settings.urlItems.length; i++) {
-      if ( 'http' !== settings.urlItems[i].substring(0, 4) )
-      {
-        continue;
-      }
-      urlItems.push({
-        name: this.getDomainFromURL(settings.urlItems[i]),
-        url: settings.urlItems[i],
-        active: false
-      })
-    }
-    settings.urlItems = urlItems;
-
-    this.setState(settings);
-
-    setTimeout(() => {
-      this.tabRotator();
-      this.activateTab(0);
-    }, 100);
-
+    return false;
   }
 
-  activateTab(index) {
-    if( 0 == this.state.urlItems.length ) {
+  const getCurrentActiveTabIndex = () => {
+    for (var i = 0; i < settings.urlItems.length; i++) {
+      if( settings.urlItems[i].active ) {
+        return i;
+      }
+    }
+    return 0
+  }
+
+  const activateTab = (index) => {
+    let s = settingsRef.current;
+
+    if( 0 == s.urlItems.length ) {
       return;
     }
 
-    for (var i = 0; i < this.state.urlItems.length; i++) {
-      this.state.urlItems[i].active = false;
+    for (var i = 0; i < s.urlItems.length; i++) {
+      s.urlItems[i].active = false;
     }
-    this.state.urlItems[index].active = true;
+    s.urlItems[index].active = true;
 
-    let urlItems = this.state.urlItems;
-    this.setState(urlItems: urlItems);
+    setSettings({...s});
   };
 
-  tabClick(index) {
-    this.activateTab(index);
+  const activateTabFromClick = (index) => {
+    activateTab(index)
   }
 
-  tabRotator() {
-    clearInterval(this.state.rotateInterval);
-    let cycleTime = parseInt(this.state.cycletime);
+  useEffect(() => {
+    clearInterval(rotateIntervalRef.current);
 
-    if( isNaN(cycleTime) ) {
-      cycleTime = 3000;
+    let cycleTime = parseInt(state.data.settings.cycletime);
+
+    if( 0 == cycleTime ) {
+      return;
     }
 
-    let urlItems = this.state.urlItems;
+    if( isNaN(cycleTime) ) {
+      return;
+    }
 
-    // Cycle tab every x seconds
-    this.state.rotateInterval = setInterval(() => {
+    cycleTime = cycleTime * 1000;
+
+    const interval = setInterval(() => {
       let itemIndex;
-      let urlItems = this.state.urlItems;
+      let urlItems = settingsRef.current.urlItems;
 
       for (var i = 0; i < urlItems.length; i++) {
         if( urlItems[i].active ) {
@@ -94,32 +115,39 @@ class Content extends React.Component{
         }
       }
 
-      if( undefined == itemIndex || itemIndex > (urlItems.length-1)) {
+      if ( undefined == itemIndex || itemIndex > (urlItems.length-1) ) {
         itemIndex = 0;
       }
 
-      this.activateTab(itemIndex);
-
+      activateTab(itemIndex);
     }, cycleTime);
-  }
+    return () => clearInterval(interval);
+  }, [state.data]);
 
-  render(props, state) {
-    return (
-      <div className="content">
-        <div className="tabs">
-          { this.state.urlItems.map( (urlItem, index) => (
-            <div key={index} onClick={this.tabClick.bind(this,index)} className={(urlItem.active ? 'active' : '')}>{urlItem.name}</div>
-          )
-        )}
-        </div>
-        <div className="iframes">
-          { this.state.urlItems.map( (urlItem, index) => (
-            <iframe key={index} src={urlItem.url} id={'iframe'+index} className={(urlItem.active ? 'active' : '')}></iframe>
-          ))}
+  return (
+    <StateContext.Consumer>
+    {context => (
+      <div>
+        <div className="content">
+          <div className="tabs">
+            { undefined !== settings.urlItems &&
+             settings.urlItems.map( (urlItem, index) => (
+                <div key={index} onClick={()=>activateTabFromClick(index)} className={(urlItem.active ? 'active' : '')}>{getDomainFromURL(urlItem.url)}</div>
+              )
+            )}
+          </div>
+          <div className="iframes">
+          { undefined !== settings.urlItems &&
+             settings.urlItems.map( (urlItem, index) => (
+              <iframe key={index} src={urlItem.url} id={'iframe'+index} className={(urlItem.active ? 'active' : '')}></iframe>
+            ))
+            }
+          </div>
         </div>
       </div>
-    )
-  }
+    )}
+  </StateContext.Consumer>
+  );
 }
 
 export default Content

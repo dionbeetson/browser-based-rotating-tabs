@@ -1,22 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { navigate } from "hookrouter";
+
+import { StateContext, useStateValue } from './../state/State.js';
 
 import Settings from './../components/Settings'
 import Content from './../components/Content'
 import FullScreen from './../components/FullScreen'
 
-class RotatingTab extends React.Component{
-  constructor(props){
-    super(props);
-  }
+const RotatingTab = ({id}) => {
 
-  render() {
-    return (
-      <div>
-        <FullScreen />
-        <Settings />
-        <Content />
-      </div>)
-  }
+  const state = useStateValue();
+
+  useEffect(() => {
+    if( id == null && state.data.settings.id > 0 ) {
+      navigate('/' + state.data.settings.id);
+    }
+  }, [state.data]);
+
+  return (
+    <div>
+      <FullScreen  />
+      <Settings />
+      <Content />
+    </div>);
 }
 
 export default RotatingTab;

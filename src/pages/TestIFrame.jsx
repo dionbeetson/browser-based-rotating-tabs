@@ -1,20 +1,14 @@
 import React from 'react';
 
-class TestIFrame extends React.Component{
-  constructor(props){
-    super(props);
-  }
+const TestIFrame = () => {
+  const items = [...Array(100).keys()];
 
-  render() {
-    const items = [...Array(100).keys()];
-    return (
-      <div>
-      { items.map( (item) => (
-        <p key={item}>{item}</p>
-      )) }
-
-      </div>)
-  }
+  return (
+    <div>
+    { items.map( (item) => (
+      <p key={item}>{item}</p>
+    )) }
+    </div>)
 }
 
 export default TestIFrame;

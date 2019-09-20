@@ -1,31 +1,24 @@
-import React from 'react';
-import { navigate } from "hookrouter";
+import React, { useEffect } from 'react';
+
+import { StateContext, useStateValue } from './../state/State.js';
 
 import UrlItem from './UrlItem'
 import SettingsHeading from './SettingsHeading'
 
-class Settings extends React.Component{
+const Settings = () => {
 
-  constructor(props){
-    super(props);
+  const state = useStateValue();
 
-		this.state = {id: undefined, cycletime: '', autoscroll: false, urlItems: []};
-
-    this.handleChange = this.handleChange.bind(this);
-		this.handleListChange = this.handleListChange.bind(this);
-		this.save = this.save.bind(this);
-  }
-
-	handleChange(event) {
+  const updateCycleTime = (event) => {
 		let name = event.target.name;
 		let value = event.target.value;
 
-    this.setState({[name]: value});
+    state.data.settings[name] = value;
+    state.updateState(state.data.settings);
   }
 
-	handleListChange(event) {
-
-		let urlItems = this.state.urlItems;
+	const updateUrlItem = (event) => {
+		let urlItems = state.data.settings.urlItems;
 
 		urlItems[event.target.attributes[0].value] = event.target.value
 
@@ -34,14 +27,13 @@ class Settings extends React.Component{
         return el != '';
     });
 
-    this.setState({urlItems: urlItems});
+    urlItems.push('');
+
+    state.data.settings.urlItems = urlItems;
+    state.updateState(state.data.settings);
   }
 
-  componentDidMount(){
-		this.load();
-  }
-
-	toggleSettingsMenu(event) {
+  const toggleSettingsMenu = (event) => {
     event.preventDefault();
 
 		if( document.body.classList.contains('settings-open') ) {
@@ -53,66 +45,72 @@ class Settings extends React.Component{
 		}
 	}
 
-	load() {
+  useEffect(() => {
+    load();
+  }, []);
+
+  const load = () => {
     let settings = JSON.parse(localStorage.getItem('settings'));
 
 		if( null == settings || undefined == settings.urlItems ) {
       return;
     }
 
-    this.setState(settings);
+    settings.urlItems.push('');
+
+    state.updateState({...settings});
   }
 
-	save() {
+	const save = () => {
     // Temporary ID for now
-		if (undefined === this.state.id ) {
+		if (null === state.data.settings.id ) {
 			const d = new Date();
-			this.state.id = d.getMilliseconds();
+			state.data.settings.id = d.getMilliseconds();
 		}
+
+    let settings = {...state.data.settings};
 
     // Remove empty item before saving
-		this.state.urlItems.pop();
+		settings.urlItems.pop();
 
-		localStorage.setItem('settings', JSON.stringify(this.state));
+		localStorage.setItem('settings', JSON.stringify(settings));
 
-		navigate('/' + this.state.id);
+    state.updateState({...settings});
   }
 
-	render(props, state) {
-    // Add empty item for new URL if needed
-		if ( 0 == this.state.urlItems.length || this.state.urlItems[this.state.urlItems.length-1].length > 0 ) {
-			this.state.urlItems.push('');
-		}
+  return (
 
-    return (
+  <StateContext.Consumer>
+    {context => (
       <div className="settings sidenav">
-        <button className="hamburger hamburger--arrow menu" type="button" onClick={this.toggleSettingsMenu}>
+        <button className="hamburger hamburger--arrow menu" type="button" onClick={toggleSettingsMenu}>
           <span className="hamburger-box">
             <span className="hamburger-inner"></span>
           </span>
         </button>
-				<SettingsHeading />
-	      <form>
-	        <label htmlFor="cycletime">Cycle time</label>
-	        <input type="number" id="cycletime" name="cycletime" min="1000" max="18000000" value={this.state.cycletime} onChange={this.handleChange} />
+  			<SettingsHeading />
 
-					<label>URLs</label>
-	        <ul className="url-list">
-						{ this.state.urlItems.map( (urlItem, index) => (
-							<UrlItem
-	  					 	key={index}
-								index={index}
-	              url={urlItem}
-								onChange={this.handleListChange}
-							/>
-						)) }
-					</ul>
+        <form>
+          <label htmlFor="cycletime">Cycle time</label>
+          <input type="number" id="cycletime" name="cycletime" min="0" max="500" value={context.data.settings.cycletime} onChange={updateCycleTime} />
 
-	        <button type="button" onClick={this.save}>Save</button>
-	      </form>
+         <label>URLs</label>
+         <ul className="url-list">
+           { context.data.settings.urlItems.map( (urlItem, index) => (
+             <UrlItem
+               key={index}
+               index={index}
+               url={urlItem}
+               onChange={updateUrlItem}
+             />
+           )) }
+         </ul>
+
+         <button type="button" onClick={save}>Save</button>
+        </form>
     	</div>
-    )
-  }
+    )}
+  </StateContext.Consumer>);
 }
 
 export default Settings

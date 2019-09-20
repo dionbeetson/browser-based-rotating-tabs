@@ -1,22 +1,16 @@
 import React from 'react';
 
-class UrlItem extends React.Component{
-  constructor(props){
-    super(props);
-  }
+const UrlItem = (props) => {
 
-	render() {
-		return (
-			<li>
-					<input
-						index={this.props.index}
-						type="url"
-						value={this.props.url}
-						onChange={this.props.onChange}
-					/>
-			</li>
-		);
-	}
+  return (
+    <li>
+        <input
+          index={props.index}
+          type="url"
+          value={props.url}
+          onChange={props.onChange}
+        />
+    </li>)
 }
 
 export default UrlItem

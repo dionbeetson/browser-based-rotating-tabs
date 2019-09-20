@@ -1,14 +1,15 @@
-import React from "react";
+import React, {useContext, useReducer} from "react";
 import ReactDOM from "react-dom";
 import { useRoutes } from "hookrouter";
 
+import { StateProvider, StateContext } from './state/State.js';
 import routes from "./routes/Routes";
 
 function App() {
   return (
-    <div>
-      {useRoutes(routes)}
-    </div>
+    <StateProvider>
+      {useRoutes(routes())}
+    </StateProvider>
   );
 }
 
