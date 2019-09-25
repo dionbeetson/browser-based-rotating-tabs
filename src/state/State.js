@@ -2,18 +2,24 @@ import React, {createContext, useContext, useState, useReducer} from 'react';
 
 export const StateContext = createContext(null);
 
+const initialState = {
+  settings: {
+    id: '',
+    cycletime: 5,
+    refreshtime: 60,
+    urlItems: [
+      location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')+'/testiframe',
+      ''
+    ],
+    savedRemotely: false,
+    dirty: false
+  }
+};
+
+export const InitialState = initialState;
+
 const provider = props => {
-  const [state, setState] = useState({
-      settings: {
-        id: null,
-        cycletime: 5,
-        refreshtime: 60,
-        urlItems: [
-          location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')+'/testiframe',
-          ''
-        ]
-      }
-    });
+  const [state, setState] = useState(initialState);
   return (
     <StateContext.Provider
       value={{

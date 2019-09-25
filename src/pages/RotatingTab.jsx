@@ -12,7 +12,7 @@ const RotatingTab = ({id}) => {
   const state = useStateValue();
 
   useEffect(() => {
-    if( id == null && state.data.settings.id > 0 ) {
+    if( id == null && state.data.settings.id.length > 0 ) {
       navigate('/' + state.data.settings.id);
     }
   }, [state.data]);
@@ -20,7 +20,7 @@ const RotatingTab = ({id}) => {
   return (
     <div>
       <FullScreen  />
-      <Settings />
+      <Settings id={id}/>
       <Content />
     </div>);
 }
