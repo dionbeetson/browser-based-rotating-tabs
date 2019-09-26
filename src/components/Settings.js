@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import axios from 'axios';
+import { navigate } from "hookrouter";
 
 import { StateContext, useStateValue, InitialState } from './../state/State.js';
 
@@ -59,6 +60,49 @@ const Settings = (id) => {
     load();
   }, []);
 
+  const loadLocal = () => {
+    let settings = JSON.parse(localStorage.getItem('settings'));
+
+    if( null == settings || undefined == settings.urlItems ) {
+      return null;
+    }
+
+    if( settings.urlItems.length > 0 && settings.urlItems[settings.urlItems.length-1] != "" ) {
+      settings.urlItems.push('');
+    }
+
+    return settings;
+  }
+
+  const loadRemote = () => {
+    if( undefined !== id.id ) {
+      axios.get(getApiURL() + id.id)
+      .then(function (response) {
+        settings = JSON.parse(response.data);
+
+        if( null == settings || undefined == settings.urlItems ) {
+          return;
+        }
+
+        if( settings.urlItems.length > 0 && settings.urlItems[settings.urlItems.length-1] != "" ) {
+          settings.urlItems.push('');
+        }
+
+        settings.savedRemotely = true;
+        dirtyRef.current = false;
+
+        // Save local
+    		localStorage.setItem('settings', JSON.stringify(settings));
+
+        state.updateState({...settings});
+      })
+      .catch(function (error) {
+      })
+      .finally(function () {
+      });
+    }
+  }
+
   const load = () => {
     let settings = null;
     const refreshTimer = 30000;
@@ -68,38 +112,24 @@ const Settings = (id) => {
       return;
     }
 
-    axios.get(getApiURL() + id.id)
-    .then(function (response) {
-      settings = JSON.parse(response.data);
-    })
-    .catch(function (error) {
-    })
-    .finally(function () {
-      if( null == settings || undefined == settings.urlItems ) {
-        settings = JSON.parse(localStorage.getItem('settings'));
-      }
+    settings = loadLocal();
 
-      if( null == settings || undefined == settings.urlItems ) {
-        return;
-      }
-
-      if( settings.urlItems.length > 0 && settings.urlItems[settings.urlItems.length-1] != "" ) {
-        settings.urlItems.push('');
-      }
-
-      settings.dirty = false;
+    if( null !== settings ) {
+      settings.savedRemotely = true;
       dirtyRef.current = false;
 
       state.updateState({...settings});
-    });
+    }
+
+    loadRemote();
 
     setTimeout(load, refreshTimer);
   }
 
 	const save = () => {
-		if (null === state.data.settings.id ) {
+		if ('' === state.data.settings.id ) {
 			const d = new Date();
-			state.data.settings.id = d.getMilliseconds();
+			state.data.settings.id = d.getMilliseconds() + '';
 		}
 
     let settings = {...state.data.settings};
@@ -111,9 +141,13 @@ const Settings = (id) => {
 		localStorage.setItem('settings', JSON.stringify(settings));
 
     // Save remotely
+    settings.cycletime = settings.cycletime.toString();
+    settings.refreshtime = settings.refreshtime.toString();
     if( false == settings.savedRemotely ) {
       axios.post(getApiURL(), settings)
       .then(function (response) {
+        settings.savedRemotely = true;
+        localStorage.setItem('settings', JSON.stringify(settings));
         dirtyRef.current = false;
       });
     } else {

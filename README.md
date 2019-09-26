@@ -5,11 +5,12 @@ This is a browser only version of the Chrome Rotating Tabs extension. I made it 
 npm install
 npm run dev
 
-Then go to http://localhost:1234
+https://127.0.0.1:1234/
+https://tabrotator.local/
 
 # Setup - Dev
 npm install
 npm run build
 
 # Hosted version
-Coming soon
+https://www.tabrotator.com

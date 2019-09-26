@@ -308,3 +308,11 @@ body.settings-open {
     transform: translate3d(-6px, -3px, 0) rotate(45deg) scale(0.7, 1);
   }
 }
+
+.welcome-page {
+  padding: 42px;
+
+  h1 {
+    font-size: 3rem;
+  }
+}

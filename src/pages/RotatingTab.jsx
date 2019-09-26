@@ -12,7 +12,14 @@ const RotatingTab = ({id}) => {
   const state = useStateValue();
 
   useEffect(() => {
-    if( id == null && state.data.settings.id.length > 0 ) {
+    let settings = JSON.parse(localStorage.getItem('settings'));
+    if( null !== settings && id === undefined && settings.id.length > 0 ) {
+      navigate('/' + settings.id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if( (id == null && state.data.settings.id.length > 0) || (id != state.data.settings.id && state.data.settings.id.length > 0)) {
       navigate('/' + state.data.settings.id);
     }
   }, [state.data]);

@@ -8,7 +8,7 @@ const initialState = {
     cycletime: 5,
     refreshtime: 60,
     urlItems: [
-      location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')+'/testiframe',
+      location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')+'/welcome',
       ''
     ],
     savedRemotely: false,

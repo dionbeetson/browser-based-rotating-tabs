@@ -5,6 +5,7 @@ import { useRoutes } from "hookrouter";
 import { StateProvider, StateContext } from './state/State.js';
 import routes from "./routes/Routes";
 
+try {
 function App() {
   return (
     <StateProvider>
@@ -14,3 +15,6 @@ function App() {
 }
 
 ReactDOM.render(<App />, document.getElementById("app"));
+}catch(e) {
+  alert(e)
+}
