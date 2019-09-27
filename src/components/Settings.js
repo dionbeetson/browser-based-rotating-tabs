@@ -14,7 +14,7 @@ const Settings = (id) => {
   let dirtyRef = useRef(dirty);
 
   const getApiURL = () => {
-    let apiUrl = window.location.protocol + '//api.' + window.location.hostname + ('' == window.location.port ? '' : ':1235') + '/settings/';
+    let apiUrl = window.location.protocol + '//api.' + window.location.hostname.replace('www.', '') + ('' == window.location.port ? '' : ':1235') + '/settings/';
     return apiUrl;
   }
 
@@ -78,7 +78,7 @@ const Settings = (id) => {
     if( undefined !== id.id ) {
       axios.get(getApiURL() + id.id)
       .then(function (response) {
-        settings = JSON.parse(response.data);
+        let settings = JSON.parse(response.data);
 
         if( null == settings || undefined == settings.urlItems ) {
           return;
@@ -97,6 +97,7 @@ const Settings = (id) => {
         state.updateState({...settings});
       })
       .catch(function (error) {
+        console.log('Error loading remote', error)
       })
       .finally(function () {
       });
@@ -143,6 +144,7 @@ const Settings = (id) => {
     // Save remotely
     settings.cycletime = settings.cycletime.toString();
     settings.refreshtime = settings.refreshtime.toString();
+
     if( false == settings.savedRemotely ) {
       axios.post(getApiURL(), settings)
       .then(function (response) {
