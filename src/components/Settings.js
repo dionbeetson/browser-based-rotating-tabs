@@ -15,6 +15,7 @@ const Settings = (id) => {
 
   const getApiURL = () => {
     let apiUrl = window.location.protocol + '//api.' + window.location.hostname.replace('www.', '') + ('' == window.location.port ? '' : ':1235') + '/settings/';
+
     return apiUrl;
   }
 
@@ -61,6 +62,7 @@ const Settings = (id) => {
   }, []);
 
   const loadLocal = () => {
+
     let settings = JSON.parse(localStorage.getItem('settings'));
 
     if( null == settings || undefined == settings.urlItems ) {
@@ -75,7 +77,9 @@ const Settings = (id) => {
   }
 
   const loadRemote = () => {
+
     if( undefined !== id.id ) {
+
       axios.get(getApiURL() + id.id)
       .then(function (response) {
         let settings = JSON.parse(response.data);
@@ -99,12 +103,11 @@ const Settings = (id) => {
       .catch(function (error) {
         console.log('Error loading remote', error)
       })
-      .finally(function () {
-      });
     }
   }
 
   const load = () => {
+
     let settings = null;
     const refreshTimer = 30000;
 
